@@ -1,6 +1,5 @@
 #include "HoudiniEngine.h"
 #include "HoudiniEngine_mesh.h"
-#include "HoudiniEngine_modifier.h"
 #include <TlHelp32.h>
 
 
@@ -57,8 +56,7 @@ __declspec( dllexport ) ClassDesc* LibClassDesc(int i)
 {
 	switch(i) {
 		case 0: return GetHoudiniEngineMeshDesc();
-		case 1: return GetHoudiniEngineModDesc();
-		default: return 0;
+		default: return nullptr;
 	}
 }
 
