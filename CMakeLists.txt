@@ -78,7 +78,7 @@ SET( HOUDINI_LIBRARY ${HOUDINI_DIR_ROOT}/custom/houdini/dsolib )
 
 SET( 3DSMAX_LIBRARIES comctl32 bmm core geom gfx mesh maxutil maxscrpt paramblk2 mnmath poly edmodel ) 
 
-SET( HOUDINI_LIBRARIES libHAPI.a) 
+SET( HOUDINI_LIBRARIES libHAPIL.a) 
 
 set( Sources ${Sources} ${BASE_DIR}/HoudiniEngine.rc ${BASE_DIR}/HoudiniEngine.def )
 
