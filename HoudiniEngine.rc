@@ -1,0 +1,211 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PANEL_MESH DIALOGEX 0, 0, 108, 166
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Filename:",-1,7,6,31,8
+    PUSHBUTTON      "Update",IDC_UPDATE_BUTTON,7,134,94,14
+    CONTROL         "filename",IDC_FILE_EDIT,"CustEdit",WS_TABSTOP,7,14,94,12
+    CONTROL         "Enable Time Update",IDC_TIME_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,48,94,10
+    PUSHBUTTON      "Reset Simulation",IDC_RESET_BUTTON,7,119,94,14
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,7,150,94,9
+    CONTROL         "Convert Scale(Input)",IDC_CONV_UNIT_I,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,58,94,10
+    CONTROL         "Convert Scale(Output)",IDC_CONV_UNIT_O,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,68,94,10
+    PUSHBUTTON      "Create Material",IDC_CREATE_MATERIAL_BUTTON,7,103,94,14
+    CONTROL         "texture_path",IDC_TEXTUREPATH_EDIT,"CustEdit",WS_TABSTOP,7,88,94,12
+    LTEXT           "Texture Path:",-1,8,79,93,8
+    CONTROL         "Auto Update",IDC_AUTOUPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,94,10
+    CONTROL         "Bypass",IDC_BYPASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,38,94,10
+END
+
+IDD_PANEL_MESH_INPUTS DIALOGEX 0, 0, 108, 152
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "- Pick Node -",IDC_NODE_0,"CustButton",WS_TABSTOP,17,7,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_1,"CustButton",WS_TABSTOP,17,21,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_2,"CustButton",WS_TABSTOP,17,35,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_3,"CustButton",WS_TABSTOP,17,49,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_4,"CustButton",WS_TABSTOP,17,63,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_5,"CustButton",WS_TABSTOP,17,76,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_6,"CustButton",WS_TABSTOP,17,90,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_7,"CustButton",WS_TABSTOP,17,104,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_8,"CustButton",WS_TABSTOP,17,118,84,12
+    CONTROL         "- Pick Node -",IDC_NODE_9,"CustButton",WS_TABSTOP,17,132,84,12
+    LTEXT           "1",-1,7,8,10,8
+    LTEXT           "2",-1,7,22,10,8
+    LTEXT           "3",-1,7,37,10,8
+    LTEXT           "4",-1,7,51,10,8
+    LTEXT           "5",-1,7,66,10,8
+    LTEXT           "6",-1,7,78,10,8
+    LTEXT           "7",-1,7,91,10,8
+    LTEXT           "8",-1,7,105,10,8
+    LTEXT           "9",-1,7,120,10,8
+    LTEXT           "10",-1,7,134,10,8
+END
+
+IDD_PANEL_MOD DIALOGEX 0, 0, 108, 191
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Filename:",-1,7,6,31,8
+    PUSHBUTTON      "Update",IDC_UPDATE_BUTTON,7,145,94,14
+    CONTROL         "filename",IDC_FILE_EDIT,"CustEdit",WS_TABSTOP,7,14,94,12
+    CONTROL         "Enable Time Update",IDC_TIME_UPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,94,10
+    PUSHBUTTON      "Reset Simulation",IDC_RESET_BUTTON,7,130,94,14
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,7,161,94,9
+    CONTROL         "Convert Scale(Input)",IDC_CONV_UNIT_I,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,43,94,10
+    CONTROL         "Convert Scale(Output)",IDC_CONV_UNIT_O,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,55,94,10
+    LTEXT           "",IDC_INFO,7,171,94,13,WS_BORDER
+    PUSHBUTTON      "Create Material",IDC_CREATE_MATERIAL_BUTTON,7,89,94,14
+    CONTROL         "texture_path",IDC_TEXTUREPATH_EDIT,"CustEdit",WS_TABSTOP,7,74,94,12
+    LTEXT           "Texture Path:",-1,8,65,44,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_PANEL_MESH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 101
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 159
+    END
+
+    IDD_PANEL_MESH_INPUTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 101
+        VERTGUIDE, 17
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 145
+    END
+
+    IDD_PANEL_MOD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 101
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 184
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PANEL_MESH AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_LIBDESCRIPTION      "Houdini Engine for 3dsMax"
+    IDS_CATEGORY            "Houdini Engine"
+    IDS_CLASS_NAME          "HEMesh"
+    IDS_PARAMS              "Houdini Digital Asset"
+    IDS_TIME                "time"
+    IDS_CLASS_NAME_MESH     "HEMesh"
+    IDS_FILENAME            "filename"
+    IDS_PATH                "path"
+    IDS_PICK                "pick"
+    IDS_HE                  "Houdini Engine"
+    IDS_HE_INPUTS           "Inputs"
+    IDS_HE_UPDATETIME       "update time"
+    IDS_FILE_TYPES          "OTL(*.otl)|*.otl|HDA(*.hda)|*.hda|All Files(*.*)|*.*|"
+    IDS_TITLE               "Load OTL"
+    IDS_HE_CONV_UNIT_I      "Convert Unit Scale Input"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_HE_CONV_UNIT_O      "Convert Unit Scale Output"
+    IDS_TEXTUREPATH         "Texture Path"
+    IDS_CLASS_NAME_HE_MOD   "HEMod"
+    IDS_HE_AUTOUPDATE       "Auto Update"
+    IDS_HE_BYPASS           "Bypass"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
