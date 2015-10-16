@@ -129,6 +129,20 @@ CreateMouseCallBack* HoudiniEngineMesh::GetCreateMouseCallBack()
 
 IObjParam *HoudiniEngineMesh::ip			= NULL;
 
+int MyEnumProc::proc(ReferenceMaker *rmaker)
+{
+	if (rmaker->SuperClassID() == BASENODE_CLASS_ID)
+	{
+		Nodes.Append(1, (INode **)&rmaker);
+		if (mbDoHalt)
+			return DEP_ENUM_HALT;
+	}
+
+	return DEP_ENUM_CONTINUE;
+}
+
+
+
 HoudiniEngineMesh::HoudiniEngineMesh()
 {
 	hapi::Engine* engine = hapi::Engine::instance();
@@ -187,6 +201,25 @@ DWORD WINAPI fn(LPVOID arg)
 	return(0);
 }
 
+#if defined(USE_NOTIFYREFCHANGED)
+
+int HoudiniEngineMesh::NumRefs()
+{
+	return 1 + inputs.getNumInputs();
+}
+
+RefTargetHandle HoudiniEngineMesh::GetReference(int i)
+{ 
+	if (i == 0)
+		return (RefTargetHandle)pblock;
+	else if (i <= inputs.getNumInputs())
+		return inputs.getINode(i - 1);
+	else
+		return nullptr;
+}
+
+#endif
+
 void HoudiniEngineMesh::BuildMesh(TimeValue t) 
 {
 	if ( buildingMesh )
@@ -215,6 +248,12 @@ void HoudiniEngineMesh::BuildMesh(TimeValue t)
 
 	if ( assetId >= 0 )
 	{
+		INode* selfNode = GetINode();
+		Matrix3 baseTM(1);
+
+		if (selfNode != nullptr)
+			baseTM = Inverse(selfNode->GetObjectTM(t));
+
 
 		float hapi_time;
 		float max_time = TicksToSec(t);
@@ -228,19 +267,6 @@ void HoudiniEngineMesh::BuildMesh(TimeValue t)
 			HAPI_SetTime(hapi::Engine::instance()->session(), TicksToSec(t));
 			cook = true;
 		}
-#if 0
-		// Input Nodes
-		{
-			double scl = conv_unit_i ? GetRelativeScale( GetUSDefaultUnit(), 1, UNITS_METERS, 1 ) : 1.0;
-
-			for ( int inpoutnode = 0; inpoutnode < HOUDINENGINE_INPUT_MAX; ++inpoutnode )
-			{
-				INode* node = pblock2->GetINode( pb_node_0+inpoutnode, t );
-				cook = inputs.setNode( inpoutnode, node, t, scl, needUpdateInputNode ) || cook;
-			}
-			needUpdateInputNode = false;
-		}
-#endif
 		// Cooking
 		if ( cook )
 		{
@@ -398,7 +424,7 @@ bool HoudiniEngineMesh::UpdateParameters(TimeValue t)
 										INode* inputnode = pblock->GetINode(id, t);
 										if (inputnode)
 										{
-											SetInputNode(index, inputnode);
+											need_cook = SetInputNode(index, inputnode) || need_cook;
 										}
 									}
 									else
@@ -453,36 +479,39 @@ bool HoudiniEngineMesh::SetInputNode(int ch, INode* node)
 	// Input Nodes
 	if (inputs.getAssetId() >= 0)
 	{
+		TimeValue t = GetCOREInterface()->GetTime();
+		INode * selfNode = GetINode();
+		Matrix3 baseTM(1);
+		
+		if (selfNode)
+			baseTM = selfNode->GetObjectTM(t);
+
 		bool conv_unit_i = pblock2->GetInt(pb_conv_unit_i) != 0;
 		double scl = conv_unit_i ? GetRelativeScale(GetUSDefaultUnit(), 1, UNITS_METERS, 1) : 1.0;
-		inputs.setNode(ch, node, GetCOREInterface()->GetTime(), scl);
+		inputs.setNode(ch, node, t, baseTM, scl, needUpdateInputNode );
 		result = true;
+#if defined(USE_NOTIFYREFCHANGED)
+		if (node->TestForLoop(FOREVER, this) == REF_SUCCEED) {
+			ReplaceReference(1+ch, (RefTargetHandle)node);
+			NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
+			NotifyDependents(FOREVER, 0, REFMSG_SUBANIM_STRUCTURE_CHANGED);
+		}
+#endif
 	}
 	return result;
 }
 
 
-class MyEnumProc : public DependentEnumProc 
-{
-public :
-	virtual int proc(ReferenceMaker *rmaker)
-	{
-		if (rmaker->SuperClassID()==BASENODE_CLASS_ID)    
-			Nodes.Append(1, (INode **)&rmaker);  
-		return DEP_ENUM_CONTINUE;
-	}
-	INodeTab Nodes;              
-};
-
 INode* HoudiniEngineMesh::GetINode()
 {
-    MyEnumProc dep;              
-	this->DoEnumDependents(&dep);
-    for (int i = 0; i < dep.Nodes.Count(); i++)
-    {
-		return dep.Nodes[i];
-	}
-	return NULL;
+	INode* selfNode = nullptr;
+	MyEnumProc dep(true);
+	
+	DoEnumDependents(&dep);
+	if (dep.Nodes.Count() > 0)
+		selfNode = dep.Nodes[0];
+
+	return selfNode;
 }
 
 bool HoudiniEngineMesh::CreateMaterial()

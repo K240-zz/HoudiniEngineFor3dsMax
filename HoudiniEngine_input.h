@@ -11,18 +11,20 @@ struct InputAsset
 	int		asset_id;
 };
 
-int InputNode( int asset_id, int input_id, INode* node, TimeValue t, double scale, InputAsset* iasset = NULL);
+int InputNode( int asset_id, int input_id, INode* node, TimeValue t, Matrix3 &baseTM, double scale, InputAsset* iasset = NULL);
+
 class InputAssets
 {
 public:
 	InputAssets();
 	~InputAssets();
 	void setAssetId( int asset_id );
-	bool setNode( int ch, INode* node, TimeValue t, double scale, bool check_v_update = false );
+	bool setNode( int ch, INode* node, TimeValue t, Matrix3 &baseTM, double scale, bool check_v_update = false );
 	void disconnect( int ch, bool free_node = true );
 	void release();
 	int getAssetId() { return assetId;  }
 	size_t getNumInputs() { return inputs.size(); }
+	INode* getINode(int ch) { return inputs[ch].node; }
 private:
 	std::vector<InputAsset>		inputs;
 	int							assetId;

@@ -19,6 +19,8 @@
 
 #define PBLOCK_REF  SIMPMOD_PBLOCKREF
 
+//#define USE_NOTIFYREFCHANGED
+
 class HoudiniEngineMesh : public SimpleObject2
 {
 public:
@@ -58,8 +60,12 @@ public:
 #endif
 	virtual int	NumParamBlocks() { return 1; }					// return number of ParamBlocks in this instance
 	virtual IParamBlock2* GetParamBlock(int i) { return pblock2; } // return i'th ParamBlock
-	virtual IParamBlock2* GetParamBlockByID(BlockID id) { return (pblock2->ID() == id) ? pblock2 : NULL; } // return id'd ParamBlock	
+	virtual IParamBlock2* GetParamBlockByID(BlockID id) { return (pblock2->ID() == id) ? pblock2 : NULL; } // return id'd ParamBlock
 
+#if defined(USE_NOTIFYREFCHANGED)
+	virtual int NumRefs();
+	virtual RefTargetHandle GetReference(int i);
+#endif
 	void BuildMesh(TimeValue t);
 	BOOL OKtoDisplay(TimeValue t);
 	void InvalidateUI();
@@ -83,6 +89,7 @@ public:
 		needUpdateInputNode = true;
 		if ( !buildingMesh )
 			BuildMesh(t);
+		needUpdateInputNode = false;
 	}
 
 	void UpdateCustomAttributes(TimeValue t)
@@ -135,5 +142,16 @@ private:
 
 
 extern ClassDesc2* GetHoudiniEngineMeshDesc();
+
+class MyEnumProc : public DependentEnumProc
+{
+public:
+	MyEnumProc(bool bDoHalt) { mbDoHalt = bDoHalt; }
+	virtual int proc(ReferenceMaker *rmaker);
+	INodeTab Nodes;
+private:
+	bool mbDoHalt;
+};
+
 
 #endif

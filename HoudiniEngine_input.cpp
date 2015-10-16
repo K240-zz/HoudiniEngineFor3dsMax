@@ -2,6 +2,9 @@
 #include "HoudiniEngine.h"
 #include "HoudiniEngine_input.h"
 #include "HoudiniEngine_util.h"
+#include <Simpobj.h>
+#include <particle.h>
+#include <IParticleObjectExt.h>
 
 class NullView: public View {
 public:
@@ -9,7 +12,7 @@ public:
 	NullView() { worldToView.IdentityMatrix(); screenW=640.0f; screenH = 480.0f; }
 };
 
-HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, double scale, InputAsset* iasset = NULL )
+HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, Matrix3 &baseTM, double scale, InputAsset* iasset = NULL )
 {
 	HAPI_AssetId asset;
 
@@ -29,7 +32,12 @@ HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, do
 	Mesh *msh = ((GeomObject*)pobj)->GetRenderMesh(t,node,nullView,needDel);
 	msh->buildNormals();
 
-    // set up part info
+	Matrix3 objectTM = node->GetObjectTM(t);
+	Matrix3 toLocalSpace = objectTM * Inverse(baseTM);
+	Matrix3 toLocalSpaceR = toLocalSpace;
+	toLocalSpaceR.SetTrans(Point3());
+
+	// set up part info
     HAPI_PartInfo partInfo;
     HAPI_PartInfo_Init(&partInfo);
     partInfo.id = 0;
@@ -60,7 +68,7 @@ HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, do
 		}
 		for ( int i = 0; i < msh->numVerts; ++i )
 		{
-			Point3 p = msh->verts[i];
+			Point3 p = msh->verts[i] * toLocalSpace;
 			float y = p.y;
 			p.y = p.z;
 			p.z = -y;
@@ -96,7 +104,7 @@ HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, do
 			for ( int j = 2; j >= 0; --j )
 			{
 	    		int vi = msh->faces[i].v[j];
-				Point3 vn = util::GetVertexNormal(msh, i, msh->getRVertPtr(vi));
+				Point3 vn = util::GetVertexNormal(msh, i, msh->getRVertPtr(vi)) * toLocalSpaceR;
 				vertexNormals.push_back(vn.x);
 				vertexNormals.push_back(vn.z);
 				vertexNormals.push_back(-vn.y);
@@ -118,7 +126,7 @@ HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, do
 	{
 		// uv range 1 to (MAX_MESHMAPS-1)
 		int useMaps = 0;
-		for (int i = 1; useMaps < msh->getNumMaps() || i < MAX_MESHMAPS; ++i)
+		for (int i = 1; useMaps < msh->getNumMaps() && i < MAX_MESHMAPS; ++i)
 		{
 			if (msh->mapSupport(i))
 			{
@@ -211,7 +219,7 @@ HAPI_AssetId InputMesh( int asset_id, int input_id, INode* node, TimeValue t, do
 	return asset;
 }
 
-HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, double scale, InputAsset* iasset = NULL )
+HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, Matrix3 &baseTM, double scale, InputAsset* iasset = NULL )
 {
 	HAPI_AssetId asset;
 
@@ -229,6 +237,10 @@ HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, do
 	PolyObject *poly = (PolyObject*)pobj;
 	MNMesh &msh = poly->GetMesh();
 
+	Matrix3 objectTM = node->GetObjectTM(t);
+	Matrix3 toLocalSpace = objectTM * Inverse(baseTM);
+	Matrix3 toLocalSpaceR = toLocalSpace;
+	toLocalSpaceR.SetTrans(Point3());
 
     // set up part info
     HAPI_PartInfo partInfo;
@@ -266,7 +278,7 @@ HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, do
 		}
 		for ( int i = 0; i < msh.numv; i++ )
 		{
-			Point3 p = msh.v[i].p;
+			Point3 p = msh.v[i].p * toLocalSpace;
 			float y = p.y;
 			p.y = p.z;
 			p.z = -y;
@@ -318,7 +330,7 @@ HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, do
 					Point3 n;
 
 					MNNormalFace& nf = nrmspec->Face(f);
-					n = nrmspec->Normal(nf.GetNormalID(i));
+					n = nrmspec->Normal(nf.GetNormalID(i)) * toLocalSpaceR;
 					vertexNormals.push_back(n.x);
 					vertexNormals.push_back(n.z);
 					vertexNormals.push_back(-n.y);
@@ -425,7 +437,7 @@ HAPI_AssetId InputPoly( int asset_id, int input_id, INode* node, TimeValue t, do
 	return asset;
 }
 
-HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, double scale,  InputAsset* iasset = NULL )
+HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, Matrix3 &baseTM, double scale,  InputAsset* iasset = NULL )
 {
 	HAPI_AssetId asset = -1;
 
@@ -433,6 +445,8 @@ HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, d
 	ShapeObject *so = (ShapeObject *)pobj;
 	{
 		BezierShape shape;
+		Matrix3 objectTM = node->GetObjectTM(t);
+		Matrix3 toLocalSpace = objectTM * Inverse(baseTM);
 
 		if(so->CanMakeBezier()) 
 			so->MakeBezier(t, shape);
@@ -518,14 +532,14 @@ HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, d
 						Point3 p;
 						if ( ix > 0 )
 						{
-							p = spline->GetInVec(ix);
+							p = spline->GetInVec(ix) * toLocalSpace;
 							float y = p.y;
 							p.y = p.z;
 							p.z = -y;
 							p *= scl;
 							coords << p.x << "," << p.y << "," << p.z << " ";
 						}
-						p = spline->GetKnotPoint(ix);
+						p = spline->GetKnotPoint(ix) * toLocalSpace;
 						float y = p.y;
 						p.y = p.z;
 						p.z = -y;
@@ -533,7 +547,7 @@ HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, d
 						coords << p.x << "," << p.y << "," << p.z << " ";
 						if ( ix < (knots-1) )
 						{
-							p = spline->GetOutVec(ix);
+							p = spline->GetOutVec(ix) * toLocalSpace;
 							float y = p.y;
 							p.y = p.z;
 							p.z = -y;
@@ -561,10 +575,141 @@ HAPI_AssetId InputCurve( int asset_id, int input_id, INode* node, TimeValue t, d
 	return asset;
 }
 
+HAPI_AssetId InputParticle(int asset_id, int input_id, INode* node, TimeValue t, Matrix3 &baseTM, double scale, InputAsset* iasset = NULL)
+{
+	HAPI_AssetId asset;
+
+	if (iasset && iasset->node && iasset->asset_id >= 0)
+	{
+		// Update
+		asset = iasset->asset_id;
+	}
+	else
+	{
+		HAPI_CreateInputAsset(hapi::Engine::instance()->session(), &asset, NULL);
+	}
+
+	// create particle
+	{
+		//get the nodes tm
+		//Matrix3 objectTM = node->GetObjectTM(t);
+		Matrix3 toLocalSpace = Inverse(baseTM);
+		ObjectState tos = node->EvalWorldState(t, TRUE);
+
+		if (tos.obj->IsParticleSystem())
+		{
+			SimpleParticle* pobj = NULL;
+			IParticleObjectExt* epobj = NULL;
+			pobj = static_cast<SimpleParticle*>(tos.obj->GetInterface(I_SIMPLEPARTICLEOBJ));
+			if (pobj)
+			{
+				pobj->UpdateParticles(t, node);
+
+				int count = pobj->parts.Count();
+
+				// set up part info
+				HAPI_PartInfo partInfo;
+				HAPI_PartInfo_Init(&partInfo);
+				partInfo.id = 0;
+				partInfo.faceCount = 0;
+				partInfo.vertexCount = 0;
+				partInfo.pointCount = count;
+
+				std::vector<float>	pt;
+				
+				pt.reserve(count * 3);
+
+				for (int pid = 0; pid < count; pid++)
+				{
+					TimeValue age = pobj->ParticleAge(t, pid);
+					TimeValue life = pobj->ParticleLife(t, pid);
+					float psize = pobj->ParticleSize(t, pid);
+					Point3 p = pobj->parts.points[pid] * toLocalSpace;
+					Point3 v = pobj->ParticleVelocity(t, pid);
+
+					float y = p.y;
+					p.y = p.z;
+					p.z = -y;
+					p *= scale;
+
+					pt.push_back(p.x);
+					pt.push_back(p.y);
+					pt.push_back(p.z);
+
+				}
+				HAPI_SetPartInfo(hapi::Engine::instance()->session(), asset, 0, 0, &partInfo);
+				HAPI_AttributeInfo pos_attr_info;
+				pos_attr_info.exists = true;
+				pos_attr_info.owner = HAPI_ATTROWNER_POINT;
+				pos_attr_info.storage = HAPI_STORAGETYPE_FLOAT;
+				pos_attr_info.count = count;
+				pos_attr_info.tupleSize = 3;
+				HAPI_AddAttribute(hapi::Engine::instance()->session(), asset, 0, 0, "P", &pos_attr_info);
+				HAPI_SetAttributeFloatData(hapi::Engine::instance()->session(), asset, 0, 0, "P", &pos_attr_info, &pt.front(), 0, count);
+			}
+			else
+			{
+				epobj = static_cast<IParticleObjectExt*>(tos.obj->GetInterface(PARTICLEOBJECTEXT_INTERFACE));
+				if (epobj)
+				{
+
+					epobj->UpdateParticles(node, t);
+
+					int count = epobj->NumParticles();
+					// set up part info
+					HAPI_PartInfo partInfo;
+					HAPI_PartInfo_Init(&partInfo);
+					partInfo.id = 0;
+					partInfo.faceCount = 0;
+					partInfo.vertexCount = 0;
+					partInfo.pointCount = count;
+
+					std::vector<float>	pt;
+
+					pt.reserve(count * 3);
+
+					for (int pid = 0; pid < count; pid++)
+					{
+						TimeValue age = epobj->GetParticleAgeByIndex(pid);
+						TimeValue life = epobj->GetParticleLifeSpanByIndex(pid);
+						Point3 p = *epobj->GetParticlePositionByIndex(pid) * toLocalSpace;
+						float psize = epobj->GetParticleScaleByIndex(pid);
+						Point3 v = *epobj->GetParticleSpeedByIndex(pid);
+
+						float y = p.y;
+						p.y = p.z;
+						p.z = -y;
+						p *= scale;
+
+						pt.push_back(p.x);
+						pt.push_back(p.y);
+						pt.push_back(p.z);
+					}
+
+					HAPI_SetPartInfo(hapi::Engine::instance()->session(), asset, 0, 0, &partInfo);
+					HAPI_AttributeInfo pos_attr_info;
+					pos_attr_info.exists = true;
+					pos_attr_info.owner = HAPI_ATTROWNER_POINT;
+					pos_attr_info.storage = HAPI_STORAGETYPE_FLOAT;
+					pos_attr_info.count = count;
+					pos_attr_info.tupleSize = 3;
+					HAPI_AddAttribute(hapi::Engine::instance()->session(), asset, 0, 0, "P", &pos_attr_info);
+					HAPI_SetAttributeFloatData(hapi::Engine::instance()->session(), asset, 0, 0, "P", &pos_attr_info, &pt.front(), 0, count);
+				}
+			}
+		}
+	}
+
+	HAPI_CommitGeo(hapi::Engine::instance()->session(), asset, 0, 0);
+	HAPI_ConnectAssetGeometry(hapi::Engine::instance()->session(), asset, 0, asset_id, input_id);
+
+	return asset;
+}
 
 
 
-HAPI_AssetId InputNode( int asset_id, int input_id, INode* node, TimeValue t, double scale, InputAsset* iasset)
+
+HAPI_AssetId InputNode( int asset_id, int input_id, INode* node, TimeValue t, Matrix3& baseTM, double scale, InputAsset* iasset)
 {
 	HAPI_AssetId asset = -1;
 	HAPI_AssetInfo assetInfo;
@@ -575,18 +720,22 @@ HAPI_AssetId InputNode( int asset_id, int input_id, INode* node, TimeValue t, do
 		Object *pobj = node->EvalWorldState(t).obj;
 		if ( pobj->SuperClassID() == GEOMOBJECT_CLASS_ID )
 		{
-			if (pobj->IsSubClassOf(polyObjectClassID)) 
+			if (pobj->IsParticleSystem())
 			{
-				asset = InputPoly( assetInfo.id, input_id, node, t, scale, iasset );
+				asset = InputParticle(assetInfo.id, input_id, node, t, baseTM, scale, iasset);
+			}
+			else if (pobj->IsSubClassOf(polyObjectClassID))
+			{
+				asset = InputPoly( assetInfo.id, input_id, node, t, baseTM, scale, iasset );
 			}
 			else
 			{
-				asset = InputMesh( assetInfo.id, input_id, node, t, scale, iasset );
+				asset = InputMesh( assetInfo.id, input_id, node, t, baseTM, scale, iasset );
 			}
 		}
 		else if ( pobj->SuperClassID() == SHAPE_CLASS_ID )                    
 		{
-			asset = InputCurve( assetInfo.id, input_id, node, t, scale, iasset );
+			asset = InputCurve( assetInfo.id, input_id, node, t, baseTM, scale, iasset );
 		}
 	}
 	return asset;
@@ -636,7 +785,7 @@ void InputAssets::setAssetId( int asset_id )
 	}
 }
 
-bool InputAssets::setNode( int ch, INode* node, TimeValue t, double scale, bool check_v_update )
+bool InputAssets::setNode( int ch, INode* node, TimeValue t, Matrix3 &baseTM, double scale, bool check_v_update )
 {
 	bool result = false;
 	if ( ch < inputs.size() )
@@ -648,7 +797,7 @@ bool InputAssets::setNode( int ch, INode* node, TimeValue t, double scale, bool 
 
 			if ( node )
 			{
-				HAPI_AssetId id = InputNode( assetInfo.id, ch, node, t, scale );
+				HAPI_AssetId id = InputNode( assetInfo.id, ch, node, t, baseTM, scale );
 				if ( id >= 0 )
 				{
 					inputs[ch].asset_id = id;
@@ -659,7 +808,7 @@ bool InputAssets::setNode( int ch, INode* node, TimeValue t, double scale, bool 
 		}
 		else if ( check_v_update && inputs[ch].node == node )
 		{
-			InputNode( assetInfo.id, ch, node, t, scale, &inputs[ch] );
+			InputNode( assetInfo.id, ch, node, t, baseTM, scale, &inputs[ch] );
 			result = true;
 		}
 	}

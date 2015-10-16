@@ -159,27 +159,30 @@ std::vector<Object> Asset::objects() const
 std::vector<Parm> Asset::parms() const
 {
     // Get all the parm infos.
-    int num_parms = nodeInfo().parmCount;
-    std::vector<HAPI_ParmInfo> parm_infos(num_parms);
-	throwOnFailure(HAPI_GetParameters(hapi::Engine::instance()->session(),
-                       this->info().nodeId, &parm_infos[0], /*start=*/0, num_parms));
-
-    // Get all the parm choice infos.
-    std::vector<HAPI_ParmChoiceInfo> parm_choice_infos(
-                this->nodeInfo().parmChoiceCount);
-
-	if (parm_choice_infos.size() > 0)
+	std::vector<Parm> result;
+	int num_parms = nodeInfo().parmCount;
+	if (num_parms)
 	{
-		throwOnFailure(HAPI_GetParmChoiceLists(hapi::Engine::instance()->session(),
-			this->info().nodeId, &parm_choice_infos[0], /*start=*/0,
-			this->nodeInfo().parmChoiceCount));
-	}
+		std::vector<HAPI_ParmInfo> parm_infos(num_parms);
+		throwOnFailure(HAPI_GetParameters(hapi::Engine::instance()->session(),
+			this->info().nodeId, &parm_infos[0], /*start=*/0, num_parms));
 
-    // Build and return a vector of Parm objects.
-    std::vector<Parm> result;
-    for (int i=0; i < num_parms; ++i)
-        result.push_back(Parm(
-                             this->info().nodeId, parm_infos[i], parm_choice_infos.size() == 0 ? nullptr : &parm_choice_infos[0]));
+		// Get all the parm choice infos.
+		std::vector<HAPI_ParmChoiceInfo> parm_choice_infos(
+			this->nodeInfo().parmChoiceCount);
+
+		if (parm_choice_infos.size() > 0)
+		{
+			throwOnFailure(HAPI_GetParmChoiceLists(hapi::Engine::instance()->session(),
+				this->info().nodeId, &parm_choice_infos[0], /*start=*/0,
+				this->nodeInfo().parmChoiceCount));
+		}
+
+		// Build and return a vector of Parm objects.
+		for (int i = 0; i < num_parms; ++i)
+			result.push_back(Parm(
+				this->info().nodeId, parm_infos[i], parm_choice_infos.size() == 0 ? nullptr : &parm_choice_infos[0]));
+	}
     return result;
 }
 
