@@ -11,26 +11,32 @@ Project files of Visual Studio is located in the build folder. To build it is ne
 #### HOUDINI
 ##### HOUDINI_ROOT
 
-    set HOUDINI_ROOT=[your houdini install path]
+    HOUDINI_ROOT=[your houdini install path]
     example:
-    set HOUDINI_ROOT=C:\Program Files\Side Effects Software\Houdini 15.0.244.16
+    HOUDINI_ROOT=C:\Program Files\Side Effects Software\Houdini 15.0.244.16
 
 #### 3DSMAX
 ##### ADSK_3DSMAX_SDK_2013
 ##### ADSK_3DSMAX_SDK_2014
 ##### ADSK_3DSMAX_SDK_2015
 ##### ADSK_3DSMAX_SDK_2016
-    set ADSK_3DSMAX_SDK_2016=[your maxsdk path]
+    ADSK_3DSMAX_SDK_2016=[your maxsdk path]
     example:
-    set ADSK_3DSMAX_SDK_2016=D:\Program Files\Autodesk\3ds Max 2016 SDK\maxsdk
+    ADSK_3DSMAX_SDK_2016=D:\Program Files\Autodesk\3ds Max 2016 SDK\maxsdk
+
+#### PATH
+    PATH = C:\Program Files\Side Effects Software\Houdini xx.y.zzz\bin;%PATH%
+    or 
+    PATH = %HOUDINI_ROOT%\bin;%PATH%
 
 ## Acknowledgement
 In advancing this project I learned a lot from following:
 
 - [HoudiniEngine for Maya](https://github.com/sideeffects/HoudiniEngineForMaya)
+  - [License](https://github.com/sideeffects/HoudiniEngineForMaya/blob/Houdini15.0/LICENSE.txt)
 - [Exocortex Crate](https://github.com/Exocortex/ExocortexCrate)
+  - [License](https://github.com/Exocortex/ExocortexCrate/blob/master/LICENSE.txt)
 - Maxsdk samples
-
 
 HoudiniEngine team gave me to solve the following problems in HAPI2.0.
 
