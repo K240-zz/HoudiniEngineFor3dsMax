@@ -2,11 +2,6 @@
 rollout HoudiniEngineCreateMeshPlugin "HoudiniEngine Create Mesh Plugin" width:500 height:280
 (
     local inifile = getDir #plugcfg + "\HoudiniEngine.ini"
-    local otl_search_path = ""
-    local dso_search_path = ""
-    local image_dso_search_path = ""
-    local audio_dso_search_path = ""
-    local multiThreading = True
     group "Mesh Plugin"
     (
         label k1 "Asset(otl,hda):" align:#left
@@ -18,10 +13,10 @@ rollout HoudiniEngineCreateMeshPlugin "HoudiniEngine Create Mesh Plugin" width:5
         edittext category_name "" fieldWidth:440 height:15 height:15 text:"HoudiniEngine"
         label l4 "HoudiniEngne Plugin Path:" align:#left
         edittext plugin_path "" fieldWidth:440 height:15 height:15 across:2
-        button plugin_path_load "..." align:#right
+    --    button plugin_path_load "..." align:#right
         label l5 "Texture Path:" align:#left
         edittext texture_path "" fieldWidth:440 height:15 height:15 across:2
-        button texture_path_load "..." align:#right
+    --    button texture_path_load "..." align:#right
     )
     
     button okButton  "Ok" pos:[300+64,240] width:64 height:24
@@ -29,12 +24,7 @@ rollout HoudiniEngineCreateMeshPlugin "HoudiniEngine Create Mesh Plugin" width:5
     
     fn load_settings =
     (
-        otl_search_path = GetINISetting inifile "HoudiniEngine" "otl_search_path"
-        dso_search_path = GetINISetting inifile "HoudiniEngine" "dso_search_path"
-        image_dso_search_path = GetINISetting inifile "HoudiniEngine" "image_dso_search_path"
-        audio_dso_search_path = GetINISetting inifile "HoudiniEngine" "audio_dso_search_path"
-        multiThreading = execute(GetINISetting inifile "HoudiniEngine" "MultiThreading")
-        local s_texture_path = GetINISetting inifile "HoudiniEngine" "dso_search_path"
+        local s_texture_path = GetINISetting inifile "HoudiniEngine" "texture_path"
         local s_plugin_path = GetINISetting inifile "HoudiniEngine" "plugin_path"
         
         if s_plugin_path == undefined or s_plugin_path.count == 0 do
