@@ -1,3 +1,5 @@
+binaries [here](https://github.com/K240/HoudiniEngineFor3dsMax/wiki/Houdini-Engine-for-3dsMax-Binary)
+
 # Houdini Engine for 3dsMax
 ## Requirements
 - Visual Studio 2012(vc110)
@@ -30,15 +32,15 @@ Project files of Visual Studio is located in the build folder. To build it is ne
     PATH = %HOUDINI_ROOT%\bin;%PATH%
 
 ## Acknowledgement
-In advancing this project I learned a lot from following:
-
+Throughout this project I learned a lot from the following:
+ 
 - [HoudiniEngine for Maya](https://github.com/sideeffects/HoudiniEngineForMaya)
   - [License](https://github.com/sideeffects/HoudiniEngineForMaya/blob/Houdini15.0/LICENSE.txt)
 - [Exocortex Crate](https://github.com/Exocortex/ExocortexCrate)
   - [License](https://github.com/Exocortex/ExocortexCrate/blob/master/LICENSE.txt)
 - Maxsdk samples
-
-HoudiniEngine team gave me to solve the following problems in HAPI2.0.
-
-1. DLL collition issue between 3dsMax(2015 and 2016) and HoudiniEngine
-2. Conflict tbb thread between 3dsMax(2013 and 2014) and HoudiniEngine
+ 
+The Houdini Engine team has helped me solving the following problems, which led to the development of HAPI2.0.
+ 
+1. DLL collisions between 3dsMax (2015 and 2016) and Houdini Engine
+2. Conflicting TBB threads between 3dsMax (2013 and 2014) and Houdini Engine
