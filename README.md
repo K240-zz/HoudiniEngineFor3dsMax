@@ -2,7 +2,7 @@
 # Houdini Engine for 3dsMax
 
 ## Binaries 
-[here](https://github.com/K240/HoudiniEngineFor3dsMax/wiki/Houdini-Engine-for-3dsMax-Binary)
+[here](https://github.com/K240/HoudiniEngineFor3dsMax/wiki/Houdini-Engine-for-3dsMax-Binaries)
 
 ## Requirements
 - Visual Studio 2012(vc110)
